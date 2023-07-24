@@ -18,7 +18,29 @@ namespace uAnimationPathRemap.Editor
         private Animator _target;
         private void OnGUI()
         {
+            // 手順 Missingなパスを収集ひとまとまりにしてから返還対象にする
+            if (_target == null)
+                return;
+            if (_target.runtimeAnimatorController == null)
+                return;
+            
             var clips = _target.runtimeAnimatorController.animationClips;
+            foreach (var clip in clips)
+            {
+                var bindings = AnimationUtility.GetCurveBindings(clip);
+                foreach (var binding in bindings)
+                {
+                    if (_target.transform.Find(binding.path) == null)
+                    {
+                        EditorGUILayout.BeginHorizontal();
+                        EditorGUILayout.LabelField(binding.path);
+                        EditorGUILayout.LabelField("->");
+                        EditorGUILayout.ObjectField(null);
+                        EditorGUILayout.EndHorizontal();
+                        
+                    }
+                }
+            }
         }
 
         public static bool IsMissingPath(Animator animator)
